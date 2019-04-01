@@ -31,7 +31,119 @@ void Init(int size)
 			int points[]={x1,y1,x1,y2,x2,y2,x2,y1,x1,y1};
 			fillpoly(5,points);
 		}
-	printf("%d %d %d %d",x1,x2,y1,y2);
+}
+
+int Vert(int grid[7][7],int row,int col,int player)
+{
+	int flag=1;
+	for (int i=0;i<4;i++)
+	{
+		if (grid[row+i][col]!=player+1)
+		{
+			flag=0;
+			break;
+		}
+	}
+	return flag;
+}
+
+int Hor(int grid[7][7],int row,int col,int player)
+{
+	int flag=1;
+	for (int i=0;i<4;i++)
+	{
+		if (grid[row][col+i]!=player+1)
+		{
+			flag=0;
+			break;
+		}
+	}
+
+	return flag;
+}
+
+int Slant_LR(int grid[7][7],int row,int col,int player)
+{
+	int i,j,count=0,flag=1;
+	for (i=row,j=col;count<4;count++)
+	{
+		if (grid[i][j]!=player+1)
+		{
+			flag=0;
+			break;
+		}
+		i--;
+		j++;
+	}
+	return flag;
+}
+
+int Slant_RL(int grid[7][7],int row,int col,int player)
+{
+	int i,j,count=0,flag=1;
+	for (i=row,j=col;count<4;count++)
+	{
+		if (grid[i][j]!=player+1)
+		{
+			flag=0;
+			break;
+		}
+		i--;
+		j--;
+	}
+	return flag;
+}
+
+int check(int grid[7][7],int row,int col,int player)
+{
+	int r,c,v=0,h=0,slr=0,srl=0,result;
+	if (row<4)
+	{
+		 v=Vert(grid,row,col,player);
+	}
+	c=0;
+	if (col>3)
+		c=col-3;
+	for (int i=0;i<3;i++)
+	{
+		h=Hor(grid,row,c+i,player);
+		if (h==1)
+			break;
+	}
+	r=row;
+	c=col;
+	while(r<6 && c<6)
+	{
+		if (grid[r+1][c+1]==player+1)
+		{
+			r+=1;
+			c+=1;
+		}
+		else
+			break;
+	}
+	if (c>2)
+	{
+		srl=Slant_RL(grid,r,c,player);
+	}
+	r=row;
+	c=col;
+	while(r<6 && c>0)
+	{
+		if (grid[r+1][c-1]==player+1)
+		{
+			r+=1;
+			c-=1;
+		}
+		else
+			break;
+	}
+	if (c<4)
+	{
+		slr=Slant_LR(grid,r,c,player);
+	}
+	result=v+h+slr+srl;
+	return result;
 }
 
 int move(int xc,int  yc,int size,int player,int full[7])
@@ -98,7 +210,7 @@ int move(int xc,int  yc,int size,int player,int full[7])
 void play(int grid[7][7],int size)
 {
 	int i,player=0,xcoin,ycoin,rcoin,y;
-	int count=10;
+	int count=49;
 	int col;
 	int full[7]={0};
 	while (count!=0)
@@ -162,6 +274,9 @@ void play(int grid[7][7],int size)
 			circle(xcoin,y,rcoin);
 			floodfill(xcoin,y,MAGENTA);
 		}
+		int chk=check(grid,i,col,(player+1)%2);
+		if (chk==1)
+			break;
 	}
 }
 
